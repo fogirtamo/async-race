@@ -94,6 +94,8 @@ let maxPage;
 let carID;
 
 reset.disabled = true;
+next.disabled = true;
+prev.disabled = true;
 
 // Заполнение гаража машинами
 function fillGarage() {
@@ -103,6 +105,10 @@ function fillGarage() {
     sendRequest('GET', urlGarage, null, null, null, null, null, null, null)
     .then(data => {
         maxPage = data.length / 7;
+        if(maxPage > 1) {
+            next.disabled = false;
+            prev.disabled = false;
+        }
 
         amountCars.textContent = `Garage (${data.length})`;
         currentPage.textContent = `Page #${page}`;
@@ -286,7 +292,6 @@ function fillGarage() {
                 updateText.disabled = true;
                 updateColor.disabled = true;
 
-
                 sendRequest('DELETE', urlGarage, null , elem.id)
                 .then(() => {
                     arrID = [];
@@ -325,7 +330,7 @@ function fillGarage() {
 
                 sendRequest('PATCH', urlEngine, null, elem.id, 'started')
                 .then((data) => {
-                    let roadDistance = garageRoad.offsetWidth - 205;
+                    let roadDistance = garageRoad.offsetWidth - 225;
                     let time = data.distance * 1.3 / data.velocity;
                     let fps = roadDistance / (time / 20);
                     let currentDistance = 0;
@@ -428,6 +433,9 @@ function fillGarage() {
 
 // Следующая страница
 next.addEventListener('click', () => {
+    audioRace.currentTime = 0;
+    audioRace.pause();
+
     for(let interval in driveObj) {
         clearInterval(driveObj[interval]);
     };
@@ -446,6 +454,9 @@ next.addEventListener('click', () => {
 
 // Предыдущая страница
 prev.addEventListener('click', () => {
+    audioRace.currentTime = 0;
+    audioRace.pause();
+
     for(let interval in driveObj) {
         clearInterval(driveObj[interval]);
     };
@@ -574,7 +585,7 @@ race.addEventListener('click', () => {
         });
         sendRequest('PATCH', urlEngine, null, elem.id, 'started')
         .then((data) => {
-            let roadDistance = garageRoad.offsetWidth - 205;
+            let roadDistance = garageRoad.offsetWidth - 225;
             let time = data.distance * 1.3 / data.velocity;
             let fps = roadDistance / (time / 20);
             let currentDistance = 0;
@@ -660,9 +671,11 @@ reset.addEventListener('click', () => {
     start.forEach((elemStart) => {
         elemStart.disabled = false;
     });
+
     stop.forEach((elemStart) => {
         elemStart.disabled = true;
     });
+    
     garageModels.forEach((elem) => {
         clearInterval(driveObj[elem.id]);
         garageModels[arrID.indexOf(elem.id)].style.marginLeft = 0;

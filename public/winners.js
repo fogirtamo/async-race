@@ -29,6 +29,9 @@ toGarage.addEventListener('click', () => {
 });
 
 toWinners.addEventListener('click', () => {
+    audioRace.currentTime = 0;
+    audioRace.pause();
+    
     for(let interval in driveObj) {
         clearInterval(driveObj[interval]);
     };
